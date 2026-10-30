@@ -19,6 +19,7 @@ CONF_LANGUAGE = "language"
 CONF_SOON_WEEKS = "soon_weeks"
 CONF_HIDE_SEEN = "hide_seen"
 CONF_PLAYER = "player"
+CONF_TRAILER_CAMERA = "trailer_camera"   # experimental: a trailer as a camera, for a Tessera screen
 
 DEFAULT_DAYS = 7
 DEFAULT_SORT = "recommended"

@@ -64,11 +64,17 @@ def async_register(hass: HomeAssistant) -> None:
             raise ServiceValidationError(f"Cineville does not show a film called {film_text!r} in your cities now")
         return film, entry
 
+    def trailer_camera(entry):
+        """The experimental trailer camera of the film's city, when it is on."""
+        return getattr(entry.runtime_data, "trailer_camera", None) if entry is not None else None
+
     async def get_film(call: ServiceCall) -> ServiceResponse:
         film, entry = need(call.data[ATTR_FILM])
         player = default_player(hass, entry)
+        camera = trailer_camera(entry)
+        where = player_name(hass, player) or (player_name(hass, camera.entity_id) if camera else "")
         return film.answer(dt_util.get_default_time_zone(), seen.is_seen(film.id, film.title),
-                           player_name(hass, player) if film.trailer else "")
+                           where if film.trailer else "")
 
     async def mark_seen(call: ServiceCall) -> None:
         film, _ = find_film(hass, call.data[ATTR_FILM])
@@ -86,6 +92,12 @@ def async_register(hass: HomeAssistant) -> None:
         if not film.trailer:
             raise ServiceValidationError(f"{film.title} has no trailer at Cineville")
         player = call.data.get(ATTR_ENTITY_ID) or default_player(hass, entry)
+        camera = trailer_camera(entry)
+        if camera is not None:
+            # Experimental: the trailer camera plays it too, for a Tessera screen's trailer tile.
+            camera.set_film(film)
+            if not player or player == camera.entity_id:
+                return
         if not player:
             raise ServiceValidationError("Choose a media player in the Cineville options, or name one")
         await hass.services.async_call("media_player", "play_media", {

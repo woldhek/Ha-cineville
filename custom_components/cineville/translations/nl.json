@@ -18,11 +18,13 @@
           "soon_weeks": "Verwacht: weken vooruit",
           "language": "Taal van de beschrijvingen",
           "hide_seen": "Films die ik gezien heb verbergen",
-          "player": "Mediaspeler voor trailers"
+          "player": "Mediaspeler voor trailers",
+          "trailer_camera": "Trailercamera (experimenteel)"
         },
         "data_description": {
           "hide_seen": "Films op de takenlijst \"Cineville gezien\" verdwijnen uit Nu te zien en Verwacht.",
-          "player": "Waar een trailer speelt als het scherm of een automatisering geen speler noemt."
+          "player": "Waar een trailer speelt als het scherm of een automatisering geen speler noemt.",
+          "trailer_camera": "Een camera die de gekozen trailer afspeelt, voor een Tessera-scherm dat kan streamen. Zet uit om hem weer weg te halen."
         }
       }
     },
@@ -45,11 +47,13 @@
           "soon_weeks": "Verwacht: weken vooruit",
           "language": "Taal van de beschrijvingen",
           "hide_seen": "Films die ik gezien heb verbergen",
-          "player": "Mediaspeler voor trailers"
+          "player": "Mediaspeler voor trailers",
+          "trailer_camera": "Trailercamera (experimenteel)"
         },
         "data_description": {
           "hide_seen": "Films op de takenlijst \"Cineville gezien\" verdwijnen uit Nu te zien en Verwacht.",
-          "player": "Waar een trailer speelt als het scherm of een automatisering geen speler noemt."
+          "player": "Waar een trailer speelt als het scherm of een automatisering geen speler noemt.",
+          "trailer_camera": "Een camera die de gekozen trailer afspeelt, voor een Tessera-scherm dat kan streamen. Zet uit om hem weer weg te halen."
         }
       }
     },
@@ -86,6 +90,16 @@
     "todo": {
       "seen": {
         "name": "Gezien"
+      }
+    },
+    "camera": {
+      "trailer": {
+        "name": "Trailer"
+      }
+    },
+    "select": {
+      "trailer_film": {
+        "name": "Trailerfilm"
       }
     }
   },

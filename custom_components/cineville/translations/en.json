@@ -18,11 +18,13 @@
           "soon_weeks": "Coming soon: weeks ahead",
           "language": "Language of the descriptions",
           "hide_seen": "Hide films I have seen",
-          "player": "Media player for trailers"
+          "player": "Media player for trailers",
+          "trailer_camera": "Trailer camera (experimental)"
         },
         "data_description": {
           "hide_seen": "Films on the \"Cineville seen\" to-do list leave Now showing and Coming soon.",
-          "player": "Where a trailer plays when the screen or an automation names no player."
+          "player": "Where a trailer plays when the screen or an automation names no player.",
+          "trailer_camera": "A camera that plays the chosen trailer, for a Tessera screen that streams. Turn it off to remove it again."
         }
       }
     },
@@ -45,11 +47,13 @@
           "soon_weeks": "Coming soon: weeks ahead",
           "language": "Language of the descriptions",
           "hide_seen": "Hide films I have seen",
-          "player": "Media player for trailers"
+          "player": "Media player for trailers",
+          "trailer_camera": "Trailer camera (experimental)"
         },
         "data_description": {
           "hide_seen": "Films on the \"Cineville seen\" to-do list leave Now showing and Coming soon.",
-          "player": "Where a trailer plays when the screen or an automation names no player."
+          "player": "Where a trailer plays when the screen or an automation names no player.",
+          "trailer_camera": "A camera that plays the chosen trailer, for a Tessera screen that streams. Turn it off to remove it again."
         }
       }
     },
@@ -86,6 +90,16 @@
     "todo": {
       "seen": {
         "name": "Seen"
+      }
+    },
+    "camera": {
+      "trailer": {
+        "name": "Trailer"
+      }
+    },
+    "select": {
+      "trailer_film": {
+        "name": "Trailer film"
       }
     }
   },

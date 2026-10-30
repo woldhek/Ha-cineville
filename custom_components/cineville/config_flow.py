@@ -31,6 +31,7 @@ from .const import (
     CONF_PLAYER,
     CONF_SOON_WEEKS,
     CONF_SORT,
+    CONF_TRAILER_CAMERA,
     CONF_VENUES,
     DEFAULT_DAYS,
     DEFAULT_HIDE_SEEN,
@@ -68,6 +69,7 @@ def _settings_schema(venues: list[dict], current: dict[str, Any]) -> vol.Schema:
         # Optional, and empty again when cleared: a suggestion rather than a default.
         vol.Optional(CONF_PLAYER, description={"suggested_value": current.get(CONF_PLAYER)}): EntitySelector(
             EntitySelectorConfig(domain="media_player")),
+        vol.Required(CONF_TRAILER_CAMERA, default=current.get(CONF_TRAILER_CAMERA, False)): BooleanSelector(),
     })
 
 

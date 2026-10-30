@@ -67,6 +67,8 @@ class CinevilleCoordinator(DataUpdateCoordinator[CinevilleData]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         super().__init__(hass, _LOGGER, config_entry=entry, name=f"{DOMAIN} {entry.data[CONF_CITY]}",
                          update_interval=UPDATE_INTERVAL)
+        self.platforms: list = []
+        self.trailer_camera = None   # experimental, with the option trailer_camera (camera.py)
         self.api = CinevilleApi(async_get_clientsession(hass), locale_for(hass, setting(entry, CONF_LANGUAGE, "auto")))
 
     async def _async_update_data(self) -> CinevilleData:

@@ -61,6 +61,17 @@ response_variable: film
 "Recommended first" puts Cineville's own picks on top: the film of the week, then the tips of its editors, then what
 shows most. The lists are kept out of the recorder's history. It asks Cineville once an hour.
 
+## Experimental: a trailer on a Tessera screen
+
+On the branch `experimental-trailer` (pre-release 0.3.0b1) only, and only with the option **Trailer camera
+(experimental)**: each city gets a camera **Trailer** that plays the chosen film's trailer, and a select **Trailer film**
+to choose it. `cineville.play_trailer` chooses it too. A Tessera screen that streams (the ESP32-P4 boards, on Tessera's
+dev firmware) shows it live with the plugin `cineville_trailer`. Home Assistant plays the trailer through its go2rtc
+(`ffmpeg:<trailer>#input=file#video=copy#audio=copy`); whether a camera of an MP4 plays well is what this tries out.
+
+To roll it back: turn the option off (the camera and the select leave the entity registry with it), or reinstall
+release 0.2.0 in HACS (**Redownload**, then pick the version).
+
 ## Tests
 
 `python3 -m pytest tests` runs the client and the lists against answers of the API, without Home Assistant.
