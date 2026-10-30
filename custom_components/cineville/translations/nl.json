@@ -4,7 +4,9 @@
       "user": {
         "title": "Cineville",
         "description": "Kies de stad waarvan je de Cineville-filmtheaters wilt volgen.",
-        "data": { "city": "Stad" }
+        "data": {
+          "city": "Stad"
+        }
       },
       "theaters": {
         "title": "Filmtheaters in {city}",
@@ -14,12 +16,22 @@
           "days": "Dagen vooruit",
           "sort": "Volgorde",
           "soon_weeks": "Verwacht: weken vooruit",
-          "language": "Taal van de beschrijvingen"
+          "language": "Taal van de beschrijvingen",
+          "hide_seen": "Films die ik gezien heb verbergen",
+          "player": "Mediaspeler voor trailers"
+        },
+        "data_description": {
+          "hide_seen": "Films op de takenlijst \"Cineville gezien\" verdwijnen uit Nu te zien en Verwacht.",
+          "player": "Waar een trailer speelt als het scherm of een automatisering geen speler noemt."
         }
       }
     },
-    "error": { "cannot_connect": "Cineville is niet bereikbaar. Probeer het later nog eens." },
-    "abort": { "already_configured": "Deze stad met deze filmtheaters is al ingesteld." }
+    "error": {
+      "cannot_connect": "Cineville is niet bereikbaar. Probeer het later nog eens."
+    },
+    "abort": {
+      "already_configured": "Deze stad met deze filmtheaters is al ingesteld."
+    }
   },
   "options": {
     "step": {
@@ -31,11 +43,19 @@
           "days": "Dagen vooruit",
           "sort": "Volgorde",
           "soon_weeks": "Verwacht: weken vooruit",
-          "language": "Taal van de beschrijvingen"
+          "language": "Taal van de beschrijvingen",
+          "hide_seen": "Films die ik gezien heb verbergen",
+          "player": "Mediaspeler voor trailers"
+        },
+        "data_description": {
+          "hide_seen": "Films op de takenlijst \"Cineville gezien\" verdwijnen uit Nu te zien en Verwacht.",
+          "player": "Waar een trailer speelt als het scherm of een automatisering geen speler noemt."
         }
       }
     },
-    "abort": { "cannot_connect": "Cineville is niet bereikbaar. Probeer het later nog eens." }
+    "abort": {
+      "cannot_connect": "Cineville is niet bereikbaar. Probeer het later nog eens."
+    }
   },
   "selector": {
     "sort": {
@@ -47,13 +67,72 @@
       }
     },
     "language": {
-      "options": { "auto": "Taal van Home Assistant", "nl": "Nederlands", "en": "Engels" }
+      "options": {
+        "auto": "Taal van Home Assistant",
+        "nl": "Nederlands",
+        "en": "Engels"
+      }
     }
   },
   "entity": {
     "sensor": {
-      "now_showing": { "name": "Nu te zien" },
-      "coming_soon": { "name": "Verwacht" }
+      "now_showing": {
+        "name": "Nu te zien"
+      },
+      "coming_soon": {
+        "name": "Verwacht"
+      }
+    },
+    "todo": {
+      "seen": {
+        "name": "Gezien"
+      }
+    }
+  },
+  "services": {
+    "get_film": {
+      "name": "Film opvragen",
+      "description": "Alles over één film: de beschrijving, regisseur, volgende voorstellingen en trailer.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "De titel van de film of het Cineville-id."
+        }
+      }
+    },
+    "mark_seen": {
+      "name": "Film als gezien markeren",
+      "description": "Zet de film op de gezien-lijst, zodat hij uit de lijsten verdwijnt.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "De titel van de film of het Cineville-id."
+        }
+      }
+    },
+    "unmark_seen": {
+      "name": "Film niet meer als gezien markeren",
+      "description": "Haalt de film van de gezien-lijst.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "De titel van de film of het Cineville-id."
+        }
+      }
+    },
+    "play_trailer": {
+      "name": "Trailer afspelen",
+      "description": "Speelt de trailer van de film af op een mediaspeler.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "De titel van de film of het Cineville-id."
+        },
+        "entity_id": {
+          "name": "Mediaspeler",
+          "description": "Laat leeg voor de mediaspeler uit de opties."
+        }
+      }
     }
   }
 }

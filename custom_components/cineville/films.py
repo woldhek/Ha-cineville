@@ -6,7 +6,9 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
+import re
 from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from .const import COMPACT_FILMS, HIGHLIGHT_TIP, HIGHLIGHT_WEEK, WEBSITE
 
@@ -74,6 +76,52 @@ def _directors(production: dict) -> str:
     return ", ".join(n for n in names if n)
 
 
+def _trailer(production: dict) -> str | None:
+    """The film's trailer, an MP4. Cineville keeps it at imgix, which (like the website asks) serves it as MP4 with
+    fm=mp4."""
+    url = ((production.get("assets") or {}).get("trailer") or {}).get("url")
+    if not url:
+        return None
+    parts = urlsplit(url)
+    if parts.hostname and parts.hostname.endswith(".imgix.net") and parts.path.endswith(".mp4"):
+        query = dict(parse_qsl(parts.query))
+        query["fm"] = "mp4"
+        url = urlunsplit(parts._replace(query=urlencode(query)))
+    return url
+
+
+def plain_text(text: str) -> str:
+    """Cineville's descriptions are Markdown: "_Drive My Car_", "**Reserveren**". The words alone, on one line."""
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text or "")
+    text = re.sub(r"[*_]+", "", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def lines_of(text: str, size: int = 44) -> list[str]:
+    """A text in pieces of at most `size` bytes of UTF-8, broken between words, each piece but the first starting
+    with its space. A Tessera screen gets every text of an answer cut to 48 bytes, so a longer text travels as a list of
+    pieces that the screen joins again."""
+    out: list[str] = []
+    line = ""
+    for word in text.split(" "):
+        piece = word if not line else " " + word
+        if line and len((line + piece).encode()) > size:
+            out.append(line)
+            line = " " + word
+        else:
+            line += piece
+        while len(line.encode()) > size:  # a single word longer than a piece
+            cut = size
+            while len(line.encode()[:cut].decode("utf-8", "ignore").encode()) != cut:
+                cut -= 1
+            head = line.encode()[:cut].decode("utf-8", "ignore")
+            out.append(head)
+            line = line[len(head):]
+    if line:
+        out.append(line)
+    return out
+
+
 def _poster(production: dict) -> str | None:
     assets = production.get("assets") or {}
     for key in ("poster", "cover"):
@@ -98,12 +146,14 @@ class Film:
     tip_by: str = ""
     description: str = ""
     poster: str | None = None
+    trailer: str | None = None
     shows: int = 0
     shows_today: int = 0
     next_start: datetime | None = None
     next_venue: str = ""
     venues: list[str] = field(default_factory=list)
     tags: set[str] = field(default_factory=set)
+    showtimes: list[tuple[datetime, str]] = field(default_factory=list)   # those still to come, soonest first
 
     @property
     def url(self) -> str:
@@ -112,6 +162,7 @@ class Film:
     def detail(self, zone: tzinfo) -> dict[str, Any]:
         """Everything about the film, for a dashboard or an automation."""
         return {
+            "id": self.id,
             "title": self.title,
             "directors": self.directors,
             "year": self.year,
@@ -128,7 +179,33 @@ class Film:
             "classic": "classic" in self.tags,
             "description": self.description,
             "poster": self.poster,
+            "trailer": self.trailer,
             "url": self.url,
+        }
+
+    def answer(self, zone: tzinfo, seen: bool, player: str, most_shows: int = 6) -> dict[str, Any]:
+        """What the action cineville.get_film answers: everything about the film for a screen or an automation. The
+        blurb comes whole and as `blurb_lines`, pieces a Tessera screen joins again (it cuts every text to 48 bytes);
+        `shows` are the next showtimes in seconds since 1970, with the theater."""
+        blurb = plain_text(self.description)
+        return {
+            "id": self.id,
+            "title": self.title,
+            "directors": self.directors,
+            "year": self.year or 0,
+            "duration": self.duration or 0,
+            "premiere": day_epoch(self.premiere, zone),
+            "highlight": self.highlight,
+            "tip_by": self.tip_by,
+            "blurb": blurb,
+            "blurb_lines": lines_of(blurb),
+            "has_trailer": bool(self.trailer),
+            "trailer": self.trailer or "",
+            "player": player,
+            "seen": seen,
+            "poster": self.poster or "",
+            "url": self.url,
+            "shows": [{"at": epoch(start), "venue": venue} for start, venue in self.showtimes[:most_shows]],
         }
 
 
@@ -149,6 +226,7 @@ def film_of(production: dict, today: date) -> Film:
         tip_by=author,
         description=((production.get("localizableAttributes") or {}).get("shortDescription") or "").strip(),
         poster=_poster(production),
+        trailer=_trailer(production),
     )
 
 
@@ -178,12 +256,15 @@ def now_showing(events: list[dict], productions: list[dict], venue_names: dict[s
         venue = venue_names.get(event.get("venueId") or "", "")
         if venue and venue not in venues_of[pid]:
             venues_of[pid].append(venue)
-        if start >= now and (film.next_start is None or start < film.next_start):
-            film.next_start = start
-            film.next_venue = venue
+        if start >= now:
+            film.showtimes.append((start, venue))
+            if film.next_start is None or start < film.next_start:
+                film.next_start = start
+                film.next_venue = venue
         film.tags.update((event.get("attributes") or {}).get("tags") or [])
     for pid, film in films.items():
         film.venues = venues_of[pid]
+        film.showtimes.sort(key=lambda s: s[0])
     return list(films.values())
 
 
@@ -200,20 +281,28 @@ def sort_films(films: list[Film], how: str) -> list[Film]:
     return sorted(films, key=key)
 
 
-def coming_soon(productions: list[dict], events: list[dict], today: date, weeks: int) -> list[Film]:
+def coming_soon(productions: list[dict], events: list[dict], today: date, weeks: int,
+                venue_names: dict[str, str] | None = None, now: datetime | None = None) -> list[Film]:
     """Films with a premiere after today and within `weeks`, soonest first; `shows` counts their previews in the
     chosen theaters (showtimes before the premiere)."""
     last = today + timedelta(weeks=weeks)
     previews: dict[str, int] = defaultdict(int)
+    times: dict[str, list[tuple[datetime, str]]] = defaultdict(list)
     for event in events:
-        if event.get("productionId"):
-            previews[event["productionId"]] += 1
+        pid = event.get("productionId")
+        if not pid:
+            continue
+        previews[pid] += 1
+        start = parse_moment(event.get("startDate"))
+        if start is not None and (now is None or start >= now):
+            times[pid].append((start, (venue_names or {}).get(event.get("venueId") or "", "")))
     out = []
     for production in productions:
         film = film_of(production, today)
         if not film.title or film.premiere is None or not (today < film.premiere <= last):
             continue
         film.shows = previews.get(film.id, 0)
+        film.showtimes = sorted(times.get(film.id, []), key=lambda s: s[0])
         out.append(film)
     out.sort(key=lambda f: (f.premiere, _RANK.get(f.highlight, 2), -f.shows, f.title.casefold()))
     return out
@@ -234,6 +323,7 @@ def compact(films: list[Film], kind: str, zone: tzinfo) -> dict[str, Any]:
     top = films[:COMPACT_FILMS]
     out: dict[str, Any] = {
         "cineville_list": kind,
+        "ids": [f.id for f in top],
         "titles": [f.title for f in top],
         "highlights": [f.highlight for f in top],
         "directors": [f.directors for f in top],

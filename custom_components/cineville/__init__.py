@@ -5,12 +5,28 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 
+from .const import DATA_SEEN, DOMAIN
 from .coordinator import CinevilleCoordinator
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.TODO]
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 type CinevilleConfigEntry = ConfigEntry[CinevilleCoordinator]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Once for every city: the list of films seen, and the actions."""
+    from . import services
+    from .seen import SeenFilms
+
+    seen = SeenFilms(hass)
+    await seen.async_load()
+    hass.data[DATA_SEEN] = seen
+    services.async_register(hass)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: CinevilleConfigEntry) -> bool:

@@ -4,7 +4,9 @@
       "user": {
         "title": "Cineville",
         "description": "Choose the city whose Cineville theaters you want to follow.",
-        "data": { "city": "City" }
+        "data": {
+          "city": "City"
+        }
       },
       "theaters": {
         "title": "Theaters in {city}",
@@ -14,12 +16,22 @@
           "days": "Days ahead",
           "sort": "Order",
           "soon_weeks": "Coming soon: weeks ahead",
-          "language": "Language of the descriptions"
+          "language": "Language of the descriptions",
+          "hide_seen": "Hide films I have seen",
+          "player": "Media player for trailers"
+        },
+        "data_description": {
+          "hide_seen": "Films on the \"Cineville seen\" to-do list leave Now showing and Coming soon.",
+          "player": "Where a trailer plays when the screen or an automation names no player."
         }
       }
     },
-    "error": { "cannot_connect": "Could not reach Cineville. Try again later." },
-    "abort": { "already_configured": "This city with these theaters is already set up." }
+    "error": {
+      "cannot_connect": "Could not reach Cineville. Try again later."
+    },
+    "abort": {
+      "already_configured": "This city with these theaters is already set up."
+    }
   },
   "options": {
     "step": {
@@ -31,11 +43,19 @@
           "days": "Days ahead",
           "sort": "Order",
           "soon_weeks": "Coming soon: weeks ahead",
-          "language": "Language of the descriptions"
+          "language": "Language of the descriptions",
+          "hide_seen": "Hide films I have seen",
+          "player": "Media player for trailers"
+        },
+        "data_description": {
+          "hide_seen": "Films on the \"Cineville seen\" to-do list leave Now showing and Coming soon.",
+          "player": "Where a trailer plays when the screen or an automation names no player."
         }
       }
     },
-    "abort": { "cannot_connect": "Could not reach Cineville. Try again later." }
+    "abort": {
+      "cannot_connect": "Could not reach Cineville. Try again later."
+    }
   },
   "selector": {
     "sort": {
@@ -47,13 +67,72 @@
       }
     },
     "language": {
-      "options": { "auto": "Home Assistant's language", "nl": "Dutch", "en": "English" }
+      "options": {
+        "auto": "Home Assistant's language",
+        "nl": "Dutch",
+        "en": "English"
+      }
     }
   },
   "entity": {
     "sensor": {
-      "now_showing": { "name": "Now showing" },
-      "coming_soon": { "name": "Coming soon" }
+      "now_showing": {
+        "name": "Now showing"
+      },
+      "coming_soon": {
+        "name": "Coming soon"
+      }
+    },
+    "todo": {
+      "seen": {
+        "name": "Seen"
+      }
+    }
+  },
+  "services": {
+    "get_film": {
+      "name": "Get film",
+      "description": "Everything about one film: its blurb, director, next showtimes and trailer.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "The film's title or its Cineville id."
+        }
+      }
+    },
+    "mark_seen": {
+      "name": "Mark film seen",
+      "description": "Puts the film on the seen list, so it leaves the lists.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "The film's title or its Cineville id."
+        }
+      }
+    },
+    "unmark_seen": {
+      "name": "Unmark film seen",
+      "description": "Takes the film off the seen list.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "The film's title or its Cineville id."
+        }
+      }
+    },
+    "play_trailer": {
+      "name": "Play trailer",
+      "description": "Plays the film's trailer on a media player.",
+      "fields": {
+        "film": {
+          "name": "Film",
+          "description": "The film's title or its Cineville id."
+        },
+        "entity_id": {
+          "name": "Media player",
+          "description": "Leave empty for the media player of the options."
+        }
+      }
     }
   }
 }

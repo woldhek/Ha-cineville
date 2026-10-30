@@ -39,6 +39,14 @@ class CinevilleData:
     soon: list[Film] = field(default_factory=list)
     updated: datetime | None = None
 
+    def find(self, film: str):
+        """A film of this city by its id or its title (any case), now showing first; None when it has none."""
+        want = " ".join(film.casefold().split())
+        for f in [*self.now, *self.soon]:
+            if f.id == film or " ".join(f.title.casefold().split()) == want:
+                return f
+        return None
+
 
 def locale_for(hass: HomeAssistant, language: str) -> str:
     if language == "auto":
@@ -90,6 +98,6 @@ class CinevilleCoordinator(DataUpdateCoordinator[CinevilleData]):
             city=city,
             venues=list(names.values()),
             now=films,
-            soon=coming_soon(soon_productions, events, now.date(), weeks),
+            soon=coming_soon(soon_productions, events, now.date(), weeks, names, now),
             updated=now,
         )

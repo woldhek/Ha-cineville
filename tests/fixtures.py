@@ -64,13 +64,16 @@ EVENTS_PAGE_2 = {
 }
 
 
-def _production(id_, slug, title, directors, year, premiere, highlights=(), poster=True):
+def _production(id_, slug, title, directors, year, premiere, highlights=(), poster=True, trailer=None, blurb=None):
     return {
         "id": id_, "slug": slug, "title": title, "productionTypeId": "film",
         "attributes": {"directors": list(directors), "duration": 120, "releaseYear": year, "premiereDate": premiere,
                        "highlights": list(highlights), "spokenLanguages": ["en"], "cast": []},
-        "localizableAttributes": {"shortDescription": f"About {title}."},
-        "assets": {"poster": {"url": f"https://culturekit-assets.imgix.net/1/assets/{id_}.jpg"}} if poster else {},
+        "localizableAttributes": {"shortDescription": blurb or f"About {title}."},
+        "assets": {
+            **({"poster": {"url": f"https://culturekit-assets.imgix.net/1/assets/{id_}.jpg"}} if poster else {}),
+            **({"trailer": {"url": trailer, "mimeType": "video/mp4"}} if trailer else {}),
+        },
     }
 
 
@@ -83,7 +86,9 @@ PRODUCTIONS = {
         _production(SUDDEN, "all-of-a-sudden", "All of a Sudden", ["Ryusuke Hamaguchi"], 2026, "2026-10-29", [
             {"type": "filmOfTheWeek", "author": "", "endDate": "2026-11-04", "startDate": "2026-10-28"},
             {"type": "tip", "author": "Emin", "endDate": None, "startDate": None},
-        ]),
+        ], trailer="https://culturekit-assets.imgix.net/1/assets/05c2f691-bce4-45e7-88ea-89eaec60aa65.mp4",
+           blurb="Tao Okamoto en Virginie Efira wandelen door Parijs en filosoferen over een betere wereld, in deze "
+                 "lekkere lange film van Ryûsuke Hamaguchi (_Drive My Car_)."),
         # The API writes a director with a newline after the name now and then.
         _production(PRIMETIME, "primetime", "Primetime", ["Lance Oppenheim\n"], 2026, "2026-10-29", [
             {"type": "tip", "author": "Emin", "endDate": None, "startDate": None},

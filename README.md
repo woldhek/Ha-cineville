@@ -33,6 +33,31 @@ Their attributes:
 | `cineville_list` | `now` or `soon` |
 | `city`, `venues` | The city and the theaters it counts |
 
+## Films you have seen
+
+Each city also has a to-do list, **Seen**, with the films you have seen; every city's list shows the same films. Mark a
+film seen with the action `cineville.mark_seen`, from the Tessera screen, or by adding its title to the list. With the
+option **Hide films I have seen** (on by default) a film on the list leaves Now showing and Coming soon at once; delete
+it from the list, or untick it, to see it again. The list is kept in Home Assistant's storage, by Cineville's own id
+of each film.
+
+## Trailers and the blurb
+
+- `films` gives each film its `description` (a short blurb) and its `trailer` (an MP4 at Cineville).
+- **Media → Cineville** in Home Assistant lists the trailers, to play on any media player that plays video.
+- The action `cineville.play_trailer` plays a film's trailer on a media player: the one you name, or the one of the
+  option **Media player for trailers**.
+- The action `cineville.get_film` answers everything about one film: its blurb (whole, and as `blurb_lines` for a
+  Tessera screen, which cuts every text to 48 bytes), director, year, duration, the next showtimes with their theater,
+  whether it has a trailer and you have seen it.
+
+```yaml
+action: cineville.get_film
+data:
+  film: All of a Sudden     # a title, or Cineville's id of the film
+response_variable: film
+```
+
 "Recommended first" puts Cineville's own picks on top: the film of the week, then the tips of its editors, then what
 shows most. The lists are kept out of the recorder's history. It asks Cineville once an hour.
 

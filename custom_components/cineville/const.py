@@ -17,10 +17,15 @@ CONF_DAYS = "days"
 CONF_SORT = "sort"
 CONF_LANGUAGE = "language"
 CONF_SOON_WEEKS = "soon_weeks"
+CONF_HIDE_SEEN = "hide_seen"
+CONF_PLAYER = "player"
 
 DEFAULT_DAYS = 7
 DEFAULT_SORT = "recommended"
 DEFAULT_SOON_WEEKS = 4
+DEFAULT_HIDE_SEEN = True
+
+DATA_SEEN = f"{DOMAIN}_seen"
 
 SORTS = ["recommended", "shows", "next", "title"]
 LANGUAGES = ["auto", "nl", "en"]

@@ -10,6 +10,9 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
+    BooleanSelector,
+    EntitySelector,
+    EntitySelectorConfig,
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
@@ -23,11 +26,14 @@ from .api import CinevilleApi, CinevilleError
 from .const import (
     CONF_CITY,
     CONF_DAYS,
+    CONF_HIDE_SEEN,
     CONF_LANGUAGE,
+    CONF_PLAYER,
     CONF_SOON_WEEKS,
     CONF_SORT,
     CONF_VENUES,
     DEFAULT_DAYS,
+    DEFAULT_HIDE_SEEN,
     DEFAULT_SOON_WEEKS,
     DEFAULT_SORT,
     DOMAIN,
@@ -58,6 +64,10 @@ def _settings_schema(venues: list[dict], current: dict[str, Any]) -> vol.Schema:
             NumberSelectorConfig(min=1, max=12, step=1, mode=NumberSelectorMode.SLIDER)),
         vol.Required(CONF_LANGUAGE, default=current.get(CONF_LANGUAGE, "auto")): SelectSelector(
             SelectSelectorConfig(options=LANGUAGES, translation_key="language", mode=SelectSelectorMode.DROPDOWN)),
+        vol.Required(CONF_HIDE_SEEN, default=current.get(CONF_HIDE_SEEN, DEFAULT_HIDE_SEEN)): BooleanSelector(),
+        # Optional, and empty again when cleared: a suggestion rather than a default.
+        vol.Optional(CONF_PLAYER, description={"suggested_value": current.get(CONF_PLAYER)}): EntitySelector(
+            EntitySelectorConfig(domain="media_player")),
     })
 
 

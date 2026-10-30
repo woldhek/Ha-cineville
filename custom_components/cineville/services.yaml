@@ -1,0 +1,32 @@
+get_film:
+  fields:
+    film:
+      required: true
+      example: All of a Sudden
+      selector:
+        text:
+mark_seen:
+  fields:
+    film:
+      required: true
+      example: All of a Sudden
+      selector:
+        text:
+unmark_seen:
+  fields:
+    film:
+      required: true
+      example: All of a Sudden
+      selector:
+        text:
+play_trailer:
+  fields:
+    film:
+      required: true
+      example: All of a Sudden
+      selector:
+        text:
+    entity_id:
+      selector:
+        entity:
+          domain: media_player
